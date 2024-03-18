@@ -17,7 +17,7 @@ Docker Compose is created with redis , worker , postgis database ,  api and fron
 
 3. Check your Graphics 
 
-    fAIr works best with graphics card. It is highly recommended to use graphics card . It might not work with CPU only (You can setup and test from bottom of this document). Nvidia Graphics cards are tested 
+    fAIr works best with graphics card. It is highly recommended to use graphics card . It might not work with CPU only (You can setup and test from **step 7** of this document). Nvidia Graphics cards are tested.
 
     You need to make sure you can see your graphics card details and can be accessed through docker by installing necessary drivers
 
@@ -54,7 +54,7 @@ Docker Compose is created with redis , worker , postgis database ,  api and fron
         ```
         export RAMP_HOME=/home/YOUR_RAMP_LOCATION
         ```
-        eg : export RAMP_HOME=/home/kshitij/ramp
+        eg : `export RAMP_HOME=/home/kshitij/ramp`
 
     - Export ```TRAINING_WORKSPACE``` Env
         Training workspace is the folder where fAIr will store its training files 
@@ -74,7 +74,7 @@ Docker Compose is created with redis , worker , postgis database ,  api and fron
 
 6. Create Env variables 
     - Create a file ```.env``` in backend with [docker_sample_env](../backend/docker_sample_env) content 
-        ```
+        ```bash
         cd backend
         cp docker_sample_env .env
         ```
@@ -82,56 +82,51 @@ Docker Compose is created with redis , worker , postgis database ,  api and fron
     
         Leave rest of the items as it is unless you know what you are doing
 
-    - Create ```.env``` in /frontend
-        ```
-        cd frontend
-        cp .env_sample .env
-        ```
-        You can leave it as it is for dev setup
-    
 7. Build & Run containers 
-
-    ```
+    ```bash
     docker compose build
-    ```
-
-    ```
     docker compose up
+    ```
+    If you are the using CPU, use the following commands:
+
+    ```bash
+    docker compose -f docker-compose-cpu.yml build 
+    docker compose -f docker-compose-cpu.yml up
     ```
 
 8. Run Migrations 
 
     Run directly bash script : 
 
-    ```
+    ```bash
     bash run_migrations.sh
     ```
 
     OR 
 
     Grab API container & Open Bash
+    ```bash
+    docker exec -it api bash
+    ```
 
-        docker exec -it api bash
-
-
-    Once Bash is promoted hit following commands 
-
-        python manage.py makemigrations
-        python manage.py makemigrations login
-        python manage.py makemigrations core
-        python manage.py migrate
+    Once Bash is promoted hit following commands: 
+    ```bash
+    python manage.py makemigrations
+    python manage.py makemigrations login
+    python manage.py makemigrations core
+    python manage.py migrate
+    ```
 
 9. Play and Develop 
 
     Restart containers 
 
-    ```
+    ```bash
     docker compose restart
     ```
 
-    Frontend will be available on 5000 port , Backend will be on 8000 , Flower will be on 5500 
-
-    Please open the frontend using URL `127.0.0.1:3000` instead of `localhost:3000` to ensure login functionality.
+    Backend will be available on 8000, and Flower will be on 5500 
+    You can now go to the [frontend setup page](Docker-frontend-setup.md) to setup the frontend.
 
 10. Want to run your local tiles ? 
 
@@ -142,7 +137,7 @@ Docker Compose is created with redis , worker , postgis database ,  api and fron
     ```
     Example docker compose : 
 
-    ```
+    ```yaml
     backend-api:
         build:
         context: ./backend
@@ -179,7 +174,7 @@ Docker Compose is created with redis , worker , postgis database ,  api and fron
         network_mode: "host"
     ```
 
-    Example .env after host change : 
+    Example `.env` after host change : 
 
     ```
     DATABASE_URL=postgis://postgres:admin@localhost:5434/ai
