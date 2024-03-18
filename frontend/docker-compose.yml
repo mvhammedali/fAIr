@@ -1,11 +1,11 @@
 version: '3.3'
 
 services:
-  fAIr_frontend:
+  fair_frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    container_name: fAIr_frontend
+    container_name: fair_frontend
     command: npm start  -- --host 0.0.0.0 --port 3000
     restart: on-failure
     ports:
