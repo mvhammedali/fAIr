@@ -103,14 +103,6 @@ To check whether Docker is installed, type
     
         Leave the other items as they are, unless you have a specific, well-defined need.
 
-    - Create ```.env``` in  directory frontend
-
-        ```
-        cd frontend
-        copy .env_sample .env
-        ```
-
-        There is no need to modify this file in a setup for development.
     
 7. Build and Run containers 
 
@@ -146,61 +138,62 @@ To check whether Docker is installed, type
     docker compose restart
     ```
 
-    Frontend will be available on port 5000, Backend on 8000, and Flower on 5500. 
+    Backend will be available on 8000, and Flower on 5500. 
+    You can now go to the [frontend setup page](Docker-frontend-setup.md) to setup the frontend.
 
-    To use your local fAIr installation, go to [Local fAIr](http://127.0.0.1:3000) with your web browser.
+
 
 Extra. Do you want to run your local tiles? 
 
-    You can use [TiTiler](https://github.com/developmentseed/titiler), [gdals2tiles](https://gdal.org/programs/gdal2tiles.html) or nginx to run your own TMS server and add the following to docker compose in order to access your localhost through docker containers. Add this to API and Worker. Also update the .env variable accordingly 
+You can use [TiTiler](https://github.com/developmentseed/titiler), [gdals2tiles](https://gdal.org/programs/gdal2tiles.html) or nginx to run your own TMS server and add the following to docker compose in order to access your localhost through docker containers. Add this to API and Worker. Also update the .env variable accordingly 
 
-    ```
+```
+network_mode: "host"
+```
+
+Example docker compose : 
+
+```yaml
+backend-api:
+    build:
+    context: ./backend
+    dockerfile: Dockerfile_CPU
+    container_name: api
+    command: python manage.py runserver 0.0.0.0:8000
+
+    ports:
+    - 8000:8000
+    volumes:
+    - ./backend:/app
+    - ${RAMP_HOME}:/RAMP_HOME
+    - ${TRAINING_WORKSPACE}:/TRAINING_WORKSPACE
+    depends_on:
+    - redis
+    - postgres
     network_mode: "host"
-    ```
 
-    Example docker compose : 
+backend-worker:
+    build:
+    context: ./backend
+    dockerfile: Dockerfile_CPU
+    container_name: worker
+    command: celery -A aiproject worker --loglevel=INFO --concurrency=1
 
-    ```
-    backend-api:
-        build:
-        context: ./backend
-        dockerfile: Dockerfile_CPU
-        container_name: api
-        command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+    - ./backend:/app
+    - ${RAMP_HOME}:/RAMP_HOME
+    - ${TRAINING_WORKSPACE}:/TRAINING_WORKSPACE
+    depends_on:
+    - backend-api
+    - redis
+    - postgres
+    network_mode: "host"
+```
 
-        ports:
-        - 8000:8000
-        volumes:
-        - ./backend:/app
-        - ${RAMP_HOME}:/RAMP_HOME
-        - ${TRAINING_WORKSPACE}:/TRAINING_WORKSPACE
-        depends_on:
-        - redis
-        - postgres
-        network_mode: "host"
+Example `.env` after this host change : 
 
-    backend-worker:
-        build:
-        context: ./backend
-        dockerfile: Dockerfile_CPU
-        container_name: worker
-        command: celery -A aiproject worker --loglevel=INFO --concurrency=1
-
-        volumes:
-        - ./backend:/app
-        - ${RAMP_HOME}:/RAMP_HOME
-        - ${TRAINING_WORKSPACE}:/TRAINING_WORKSPACE
-        depends_on:
-        - backend-api
-        - redis
-        - postgres
-        network_mode: "host"
-    ```
-
-    Example .env after this host change : 
-
-    ```
-    DATABASE_URL=postgis://postgres:admin@localhost:5434/ai
-    CELERY_BROKER_URL="redis://localhost:6379/0"
-    CELERY_RESULT_BACKEND="redis://localhost:6379/0"
-    ```
+```
+DATABASE_URL=postgis://postgres:admin@localhost:5434/ai
+CELERY_BROKER_URL="redis://localhost:6379/0"
+CELERY_RESULT_BACKEND="redis://localhost:6379/0"
+```
