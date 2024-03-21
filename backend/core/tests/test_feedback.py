@@ -163,7 +163,9 @@ class TestFeedbackCreateView(APILiveServerTestCase):
             "user": user,
             "source_imagery": "https://www.testurl.com",
         }
-        response = self.client.post(f"{API_BASE}/feedback-aoi/", data, headers=headersList)
+        response = self.client.post(
+            f"{API_BASE}/feedback-aoi/", data, headers=headersList
+        )
         self.assertEqual(FeedbackAOI.objects.count(), 1)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -179,5 +181,3 @@ class TestFeedbackCreateView(APILiveServerTestCase):
         }
         response = self.client.post(f"{API_BASE}/feedback-aoi/", data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-

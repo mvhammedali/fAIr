@@ -18,7 +18,6 @@ headersList = {
 }
 
 
-
 class DatasetListTestViews(TestCase):
     def setUp(self):
         # Initialize test data
@@ -50,6 +49,7 @@ class DatasetListTestViews(TestCase):
         serializer = DatasetSerializer(dataset)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
 class TestDatasetCreateView(APILiveServerTestCase):
     def setUp(self):
