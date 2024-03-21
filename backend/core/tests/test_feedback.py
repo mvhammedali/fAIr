@@ -123,7 +123,7 @@ class TestFeedbackCreateView(APILiveServerTestCase):
         )
 
     def test_feedback_create_view(self):
-        # test that feedback doesn't work if not authenticated
+        # test that feedback creation works if authenticated and authorized
         user = self.osm_user.osm_id
         training = self.training.id
         data = {
@@ -137,7 +137,7 @@ class TestFeedbackCreateView(APILiveServerTestCase):
         response = self.client.post(f"{API_BASE}/feedback/", data, headers=headersList)
         self.assertEqual(Feedback.objects.count(), 2)
 
-    def test_auth_required(self):
+    def test_feedback_auth_required(self):
         # Test that permission is required to create feedback
         user = self.osm_user.osm_id
         training = self.training.id
@@ -152,3 +152,32 @@ class TestFeedbackCreateView(APILiveServerTestCase):
         response = self.client.post(f"{API_BASE}/feedback/", data)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_feedback_aoi_create_view(self):
+        # test that feedback AOI creation works if authenticated and authorized
+        user = self.osm_user.osm_id
+        training = self.training.id
+        data = {
+            "training": training,
+            "geom": "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))",
+            "user": user,
+            "source_imagery": "https://www.testurl.com",
+        }
+        response = self.client.post(f"{API_BASE}/feedback-aoi/", data, headers=headersList)
+        self.assertEqual(FeedbackAOI.objects.count(), 1)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_feedback_aoi_auth_require(self):
+        # test that feedback AOI creation does not work if authenticated and authorized
+        user = self.osm_user.osm_id
+        training = self.training.id
+        data = {
+            "training": training,
+            "geom": "POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))",
+            "user": user,
+            "source_imagery": "https://www.testurl.com",
+        }
+        response = self.client.post(f"{API_BASE}/feedback-aoi/", data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
