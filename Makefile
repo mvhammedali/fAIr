@@ -10,7 +10,7 @@ help:
 
 
 # Define variables
-COMPOSE = docker-compose
+COMPOSE = docker compose
 API_CONTAINER = api
 
 # Targets
